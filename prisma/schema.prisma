@@ -1,0 +1,45 @@
+// schema.prisma
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                String              @id @db.Uuid
+  name              String              @db.VarChar(255)
+  email             String              @unique @db.VarChar(255)
+  firstName         String              @db.VarChar(255)
+  lastName          String?             @db.VarChar(255)
+  mobileNumber      String              @db.VarChar(255)
+  status            Boolean             @default(true)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  members          MemberAssignment[]
+}
+
+model Member {
+  id                Int                 @id @default(autoincrement())
+  name              String              @db.VarChar(255)
+  email             String              @unique @db.VarChar(255)
+  password          String
+  status            Boolean             @default(true)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  users           MemberAssignment[]
+}
+
+model MemberAssignment {
+  memberId          Int
+  userId            String              @db.Uuid
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  member            Member              @relation(fields: [memberId], references: [id])
+  user              User                @relation(fields: [userId], references: [id])
+
+  @@id([memberId, userId])
+}
